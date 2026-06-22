@@ -1,4 +1,4 @@
-# GeopoliticalHistoryRAG
+# ModernConflictRAG
 
 A Hybrid Retrieval-Augmented Generation (RAG) system for geopolitical and modern historical documents using PGVector, PostgreSQL Full-Text Search, Reciprocal Rank Fusion (RRF), and Cross-Encoder Reranking.
 
@@ -6,7 +6,7 @@ A Hybrid Retrieval-Augmented Generation (RAG) system for geopolitical and modern
 
 ## Overview
 
-GeopoliticalHistoryRAG is an end-to-end RAG pipeline designed for collections of modern historical and geopolitical texts. The system combines semantic vector search with lexical retrieval to improve recall and uses a cross-encoder reranker to maximize relevance before passing context to an LLM.
+ModernConflictRAG is an end-to-end RAG pipeline designed for collections of modern historical and geopolitical conflict texts. The system combines semantic vector search with lexical retrieval to improve recall and uses a cross-encoder reranker to maximize relevance before passing context to an LLM.
 
 The project focuses on retrieval quality and transparency rather than building a complex interface.
 
@@ -106,8 +106,8 @@ Cross-Encoder Reranker
 Clone the repository:
 
 ```bash
-git clone https://github.com/the-voivode/GeopoliticalHistoryRAG.git
-cd GeopoliticalHistoryRAG
+git clone https://github.com/the-voivode/ModernConflictRAG.git
+cd ModernConflictRAG
 ```
 
 Install dependencies:
@@ -141,7 +141,7 @@ CREATE EXTENSION IF NOT EXISTS vector;
 Example connection string:
 
 ```python
-postgresql+psycopg://USER:PASSWORD@localhost:5432/geopolitical_rag
+postgresql+psycopg://USER:PASSWORD@localhost:5432/ModernConflictRAG
 ```
 
 ---
@@ -326,10 +326,10 @@ Only the highest-ranked chunks are passed to the language model.
 ## Citation
 
 ```bibtex
-@software{GeopoliticalHistoryRAG,
-  title = {GeopoliticalHistoryRAG},
+@software{ModernConflictRAG,
+  title = {ModernConflictRAG},
   author = {the-voivode},
   year = {2026},
-  description = {A Hybrid Retrieval-Augmented Generation System for Geopolitical and Modern Historical Documents using PGVector, PostgreSQL Full-Text Search, Reciprocal Rank Fusion, and Cross-Encoder Reranking.}
+  description = {A Hybrid Retrieval-Augmented Generation System for Geopolitical and Modern Historical Conflict Documents using PGVector, PostgreSQL Full-Text Search, Reciprocal Rank Fusion, and Cross-Encoder Reranking.}
 }
 ```
