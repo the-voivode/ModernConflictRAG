@@ -298,13 +298,10 @@ Only the highest-ranked chunks are passed to the language model.
 
 ## Screenshots
 
-### Streamlit Interface
+### Streamlit Interface, Generated Answer and Retrieved Sources
 
-[link to image]
-
-### Generated Answer and Retrieved Sources
-
-[link to image]
+![App Screenshot](Screenshots/Screenshot2.png)
+![App Screenshot](Screenshots/Screenshot1.png)
 
 ---
 
