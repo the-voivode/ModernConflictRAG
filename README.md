@@ -4,6 +4,15 @@ A Hybrid Retrieval-Augmented Generation (RAG) system for geopolitical and modern
 
 ---
 
+## Screenshots
+
+### Streamlit Interface, Generated Answer and Retrieved Sources
+
+![App Screenshot](Screenshots/Screenshot2.png)
+![App Screenshot](Screenshots/Screenshot1.png)
+
+---
+
 ## Overview
 
 ModernConflictRAG is an end-to-end RAG pipeline designed for collections of modern historical and geopolitical conflict texts. The system combines semantic vector search with lexical retrieval to improve recall and uses a cross-encoder reranker to maximize relevance before passing context to an LLM.
@@ -293,15 +302,6 @@ Only the highest-ranked chunks are passed to the language model.
 - Parent-child retrieval
 - Multilingual support
 - Fine-tuned embedding models
-
----
-
-## Screenshots
-
-### Streamlit Interface, Generated Answer and Retrieved Sources
-
-![App Screenshot](Screenshots/Screenshot2.png)
-![App Screenshot](Screenshots/Screenshot1.png)
 
 ---
 
