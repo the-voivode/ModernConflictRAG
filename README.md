@@ -1,178 +1,207 @@
-# News RAG (PGVector + Hybrid Retrieval Benchmarks)
+# GeopoliticalHistoryRAG
 
-A small end-to-end Retrieval-Augmented Generation (RAG) prototype for a news-style corpus:
-**ingest → chunk → embed → store in Postgres/pgvector → retrieve (dense / lexical / hybrid) → optional cross-encoder rerank → evaluate retrieval speed & quality**.
+A Hybrid Retrieval-Augmented Generation (RAG) system for geopolitical and modern historical documents using PGVector, PostgreSQL Full-Text Search, Reciprocal Rank Fusion (RRF), and Cross-Encoder Reranking.
 
-This repo focuses on **retrieval + benchmarking**, not fancy UI demos.
+---
+
+## Overview
+
+GeopoliticalHistoryRAG is an end-to-end RAG pipeline designed for collections of modern historical and geopolitical texts. The system combines semantic vector search with lexical retrieval to improve recall and uses a cross-encoder reranker to maximize relevance before passing context to an LLM.
+
+The project focuses on retrieval quality and transparency rather than building a complex interface.
+
+---
 
 ## Features
-- **PGVector-backed vector store** (Postgres + pgvector)
-- **Dense retrieval** via sentence embeddings (e.g., BGE)
-- **Optional lexical retrieval** (BM25-style) and **hybrid** combinations
-- **Optional cross-encoder reranking** for relevance boosts
-- **Benchmark script(s)** for raw retrieval speed and reranking latency
-- Configurable chunking + metadata flow
 
-## Project Structure
-- `loader.py` — loads source documents / dataset into memory
-- `chunker.py` — chunking logic
-- `embed_chunks_to_pg.py` — embeds chunks and inserts them into PGVector collection
-- `test_retrieval.py` — retrieval benchmarking (dense / lexical / hybrid / rerank)
-- `rag_qa.py` — example QA flow using retrieved contexts
-- `config.py` — central settings (models, DB connection, collection names)
-- `artifacts/` — outputs, logs, intermediate results
-- `metadata/` — stored metadata for chunks / documents
+- PGVector-backed vector database
+- PostgreSQL Full-Text Search (BM25-like lexical retrieval)
+- Dense semantic retrieval with BGE embeddings
+- Hybrid retrieval (dense + lexical)
+- Reciprocal Rank Fusion (RRF)
+- Cross-encoder reranking
+- Source-aware context construction
+- Grounded answer generation
+- Streamlit interface
+- Modular ingestion and benchmarking pipeline
 
-## Requirements
-- Python 3.10+ recommended
-- Postgres with **pgvector** enabled
-- GPU is optional (CPU works fine; cross-encoders can be slower on CPU)
+---
 
-Install Python deps:
-```bash
-pip install -r requirements.txt
+## Architecture
+
+```text
+Question
+    │
+    ▼
+Dense Retrieval (BGE + PGVector)
+    │
+    ├──────────────┐
+    │              │
+    ▼              ▼
+Semantic Search    Lexical Search
+                   (PostgreSQL FTS)
+    │              │
+    └──────┬───────┘
+           ▼
+      RRF Fusion
+           ▼
+     Top Candidates
+           ▼
+Cross-Encoder Reranker
+(BAAI/bge-reranker-base)
+           ▼
+     Top Contexts
+           ▼
+      Prompt Builder
+           ▼
+          LLM
+           ▼
+         Answer
 ```
 
-# News RAG (PGVector + Hybrid Retrieval + Reranking)
+---
 
-A compact RAG prototype for a news-style corpus:
-**load → chunk → embed → store in Postgres/pgvector → retrieve (dense / lexical / hybrid) → optional cross-encoder rerank → benchmark speed & relevance**.
+## Technology Stack
 
-This repo is mainly about **retrieval and benchmarking**, not building a flashy app.
+| Component | Technology |
+|------------|------------|
+| Vector Database | PGVector |
+| Database | PostgreSQL |
+| Embeddings | BAAI/bge-large-en |
+| Lexical Search | PostgreSQL Full-Text Search |
+| Fusion | Reciprocal Rank Fusion (RRF) |
+| Reranker | BAAI/bge-reranker-base |
+| LLM Provider | OpenRouter |
+| LLM Models | nvidia/nemotron-3-super-120b |
+| Interface | Streamlit |
+| Frameworks | LangChain, SentenceTransformers |
+| ORM | SQLAlchemy |
 
 ---
 
-## What’s in here
+## Repository Structure
 
-- **Postgres + pgvector** as the vector store
-- **Dense retrieval** using sentence embeddings (e.g., BGE)
-- **Optional lexical retrieval** (BM25-style) and **hybrid** combinations
-- **Optional cross-encoder reranking** (SentenceTransformers CrossEncoder)
-- Scripts for **embedding into PGVector** and **testing retrieval latency**
-- Minimal QA pipeline example (retrieve contexts, then answer with an LLM)
-
----
-
-## Repo layout
-
-Based on the current project files:
-
-- `loader.py`  
-  Loads documents / dataset (source depends on your setup).
-
-- `chunker.py`  
-  Splits documents into chunks suitable for embeddings + retrieval.
-
-- `embed_chunks_to_pg.py`  
-  Embeds chunks and inserts them into a PGVector collection.
-
-- `test_retrieval.py`  
-  Retrieval benchmarking: dense / lexical / hybrid / rerank (depending on what you enable).
-
-- `rag_qa.py`  
-  Example QA flow using retrieved chunks as context.
-
-- `config.py`  
-  Central configuration: DB connection, collection name, model names, top-k, etc.
-
-- `metadata/`  
-  Metadata produced during ingestion/chunking (if used by your pipeline).
-
-- `artifacts/`  
-  Outputs/logs/intermediate artifacts.
-
-- `.env`  
-  API keys / secrets **(must NOT be committed)**.
+```text
+.
+├── loader.py
+├── chunker.py
+├── embed_chunks_to_pg.py
+├── test_retrieval.py
+├── rag_qa.py
+├── app.py
+├── config.py
+├── artifacts/
+├── metadata/
+├── screenshots/
+├── architecture/
+├── requirements.txt
+├── .env
+└── README.md
+```
 
 ---
 
-## Requirements
+## Installation
 
-- Python **3.10+** recommended
-- Postgres with **pgvector** enabled
-- (Optional) GPU for faster embedding/reranking
+Clone the repository:
+
+```bash
+git clone https://github.com/the-voivode/GeopoliticalHistoryRAG.git
+cd GeopoliticalHistoryRAG
+```
 
 Install dependencies:
 
 ```bash
 pip install -r requirements.txt
-````
-
----
-
-## Environment variables
-
-Create a `.env` file (do not commit it):
-
-```env
-OPENROUTER_API_KEY=your_key_here
-# Add any other keys used by your scripts
 ```
 
-**Important:** Ensure `.env` is in `.gitignore`.
+---
+
+## Environment Variables
+
+Create a `.env` file:
+
+```env
+OPENROUTER_API_KEY=your_api_key_here
+```
+
+Ensure `.env` is included in `.gitignore`.
 
 ---
 
-## Postgres + pgvector setup
+## PostgreSQL + PGVector Setup
 
-1. Install Postgres
-2. Enable `pgvector` in your database:
+Enable the vector extension:
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS vector;
 ```
 
-3. Set your DB connection in `config.py` (or refactor to env vars if you prefer).
-   Example connection string pattern:
+Example connection string:
 
-* `postgresql+psycopg://USER:PASSWORD@localhost:5432/news_rag`
+```python
+postgresql+psycopg://USER:PASSWORD@localhost:5432/geopolitical_rag
+```
 
 ---
 
-## Quickstart
+## Quick Start
 
-### 1) Configure
+### 1. Configure
 
-Open `config.py` and set:
+Set:
 
-* `CONNECTION_STRING`
-* `COLLECTION_NAME`
-* embedding model name (e.g., `BAAI/bge-large-en`)
-* any retrieval parameters (top-k, reranker toggle, etc.)
+- Connection string
+- Collection name
+- Embedding model
+- Retrieval parameters
+- Reranker settings
 
-### 2) Load + chunk
+inside `config.py`.
 
-Run your ingestion logic (depends on how `loader.py` is written):
+---
+
+### 2. Load Documents
 
 ```bash
 python loader.py
+```
+
+---
+
+### 3. Chunk Documents
+
+```bash
 python chunker.py
 ```
 
-If your pipeline combines these steps elsewhere, skip this and use your actual entrypoint.
+---
 
-### 3) Embed + store in PGVector
+### 4. Embed and Store in PGVector
 
 ```bash
 python embed_chunks_to_pg.py
 ```
 
-This step creates/uses the configured collection and inserts embedded chunks into Postgres.
+---
 
-### 4) Benchmark retrieval
+### 5. Benchmark Retrieval
 
 ```bash
 python test_retrieval.py
 ```
 
-Typical benchmark modes include:
+Supported retrieval modes:
 
-* dense-only retrieval
-* lexical-only retrieval (if implemented/enabled)
-* hybrid retrieval (dense + lexical fusion)
-* optional cross-encoder reranking latency
+- Dense retrieval
+- Lexical retrieval
+- Hybrid retrieval
+- Cross-encoder reranking
 
-### 5) Run QA example (optional)
+---
+
+### 6. Run Question Answering
 
 ```bash
 python rag_qa.py
@@ -180,57 +209,130 @@ python rag_qa.py
 
 ---
 
-## What “hybrid” means here
+### 7. Launch the Streamlit Interface
 
-Hybrid retrieval generally means combining:
-
-* **Dense** semantic search (embeddings)
-* **Lexical** term-based search (BM25-like)
-
-Then either:
-
-* merge results with a simple fusion strategy (e.g., weighted, RRF)
-* optionally **rerank** the merged candidates using a cross-encoder
-
-Exact behavior depends on how your `test_retrieval.py` is implemented.
+```bash
+streamlit run app.py
+```
 
 ---
 
-## Notes & gotchas
+## Retrieval Pipeline
 
-* **Do not commit secrets:** `.env` should be ignored. If you accidentally committed it once, rotate keys.
-* Cross-encoders can be slow on CPU. For speed benchmarks:
+### Dense Retrieval
 
-  * use a smaller reranker model
-  * limit rerank candidate count (e.g., rerank top 20)
-* If Postgres feels slow, check indexes and connection pooling.
+Semantic search is performed using:
+
+- BAAI/bge-large-en
+- PGVector
+- Cosine similarity
 
 ---
 
-## Suggested `.gitignore` (minimum)
+### Lexical Retrieval
 
-At minimum, your repo should ignore:
+Lexical matching is performed using PostgreSQL Full-Text Search.
 
-* `.env`
-* `__pycache__/`
-* `.ipynb_checkpoints/`
-* `artifacts/` (if it contains generated output)
-* `metadata/` (if it contains generated output)
+---
 
-(You can expand this depending on how you use those folders.)
+### Hybrid Retrieval
+
+Dense and lexical results are combined using:
+
+- Reciprocal Rank Fusion (RRF)
+
+---
+
+### Cross-Encoder Reranking
+
+Candidate passages are reranked using:
+
+- BAAI/bge-reranker-base
+
+Only the highest-ranked chunks are passed to the language model.
+
+---
+
+## Example Query
+
+### Question
+
+> What caused the French Revolution?
+
+### Retrieved Context
+
+- Economic crises
+- Social inequality
+- Enlightenment ideas
+
+### Generated Answer
+
+> According to the retrieved sources, the French Revolution resulted from financial instability, social inequality, and Enlightenment thought.
+
+---
+
+## Project Goals
+
+- Improve retrieval quality through hybrid search
+- Reduce hallucinations via grounded context
+- Provide transparent source-aware answers
+- Explore retrieval optimization techniques
+- Benchmark semantic and lexical retrieval strategies
+
+---
+
+## Future Work
+
+- Query expansion
+- Metadata filtering
+- RAGAS evaluation
+- Knowledge graph integration
+- GraphRAG
+- Agentic RAG
+- Multi-query retrieval
+- Parent-child retrieval
+- Multilingual support
+- Fine-tuned embedding models
+
+---
+
+## Screenshots
+
+### Streamlit Interface
+
+[link to image]
+
+### Generated Answer and Retrieved Sources
+
+[link to image]
+
+---
+
+## Built With
+
+- LangChain
+- SentenceTransformers
+- PGVector
+- PostgreSQL
+- SQLAlchemy
+- HuggingFace
+- Streamlit
+- OpenRouter
 
 ---
 
 ## License
 
-Pick one (recommended): **MIT** or **Apache-2.0**.
-Or leave it unlicensed if you enjoy ambiguity and confusion.
 
 ---
 
-## Credits
+## Citation
 
-Built as part of a personal “News RAG” prototype focusing on retrieval quality and speed tradeoffs.
-
-
-
+```bibtex
+@software{GeopoliticalHistoryRAG,
+  title = {GeopoliticalHistoryRAG},
+  author = {the-voivode},
+  year = {2026},
+  description = {A Hybrid Retrieval-Augmented Generation System for Geopolitical and Modern Historical Documents using PGVector, PostgreSQL Full-Text Search, Reciprocal Rank Fusion, and Cross-Encoder Reranking.}
+}
+```
